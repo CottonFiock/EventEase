@@ -1,0 +1,47 @@
+@page "/add-event"
+@using EventEase.Data
+@inject EventEase.Data.EventService EventService
+
+<h3>Add Event</h3>
+
+<EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="@Model.Name" />
+        <ValidationMessage For="@(() => Model.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <InputDate id="date" class="form-control" @bind-Value="@Model.Date" />
+        <ValidationMessage For="@(() => Model.Date)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <InputText id="location" class="form-control" @bind-Value="@Model.Location" />
+        <ValidationMessage For="@(() => Model.Location)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Event</button>
+</EditForm>
+
+@code {
+    // Use the Event class from the Data folder as the model
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    private IServiceProvider ServiceProvider { get; set; }
+
+    private Event Model { get; set; } = new Event();
+
+    private void HandleValidSubmit()
+    {
+        EventService.AddEvent(Model);
+        NavigationManager.NavigateTo("/home");
+    }
+}

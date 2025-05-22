@@ -1,0 +1,17 @@
+﻿@page "/home"
+@page "/"
+@inject EventEase.Data.EventService EventService
+
+
+<h3>Event List</h3>
+<ul>
+    @foreach (var ev in EventService.Events)
+    {
+        <li>
+            <strong>@ev.Name</strong> - @ev.Date.ToShortDateString() - @ev.Location
+            <NavLink class="btn btn-link" href="@($"/event/{ev.Id}")">See Details</NavLink>
+        </li>
+    }
+</ul>
+
+<NavLink href="/add-event">Add event</NavLink>

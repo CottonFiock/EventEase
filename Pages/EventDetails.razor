@@ -1,0 +1,71 @@
+@page "/event/{id:int}"
+
+@using EventEase.Data
+
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+@inject EventEase.Services.UserSessionService UserSessionService
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EventEase.Data.Event? Event;
+
+    protected override void OnParametersSet()
+    {
+        Event = EventService.Events.FirstOrDefault(e => e.Id == Id);
+    }
+
+    private void Attend()
+    {
+        if (UserSessionService.IsLoggedIn && Event != null)
+        {
+            EventService.RegisterAttendance(Event.Id, UserSessionService.Email);
+        }
+    }
+}
+
+@if (Event == null)
+{
+    <p>Event not found.</p>
+}
+else
+{
+    <h3>@Event.Name</h3>
+    <p><strong>Date:</strong> @Event.Date.ToShortDateString()</p>
+    <p><strong>Location:</strong> @Event.Location</p>
+
+    @if (UserSessionService.IsLoggedIn)
+    {
+        @if (Event.Attendees.Contains(UserSessionService.Email))
+        {
+            <p class="text-success">You are attending this event.</p>
+        }
+        else
+        {
+            <button class="btn btn-success" @onclick="Attend">Attend</button>
+        }
+    }
+    else
+    {
+        <p><NavLink href="/login">Log in</NavLink> to attend this event.</p>
+    }
+
+    <h5>Attendees:</h5>
+    <ul>
+        @foreach (var attendee in Event.Attendees)
+        {
+            <li>@attendee</li>
+        }
+    </ul>
+}
+
+<button class="btn btn-primary" @onclick="GoBack">Back to Home</button>
+
+@code {
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/home");
+    }
+}
